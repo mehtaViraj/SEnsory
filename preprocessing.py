@@ -101,5 +101,5 @@ def load_dataset(path=DATA_PATH):
 
     return dataset[:100]
 
-
-print(prepare_dataset(DATA_PATH))
+#output is kinda cursed
+#print(prepare_dataset(DATA_PATH))
