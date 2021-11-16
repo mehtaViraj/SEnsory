@@ -1,7 +1,6 @@
 import time
 import RPi.GPIO as GPIO
 import math
-import threading
 
 class ServoHandler:
     def __init__(self, pin1, pin2):
@@ -17,24 +16,43 @@ class ServoHandler:
         self.pin1.start(0)
         self.pin2.start(0)
 
-        self.thread = None
-        self.isRunning = False
-        self.isManualMoving = True
+        self.movingForever = False
+        self.forevertime = 0
 
-    def multithreader(self, func):
-        def wrapper(*args, **kwargs):
-            if self.isStarted or self.isManualMoving:
-                print("Thread already running")
-            else:
-                self.thread = threading.Thread(target=func, args=(*args, *kwargs))
-                self.thread.setDaemon(True)
-                self.thread.start()
-                #self.isRunning = True
-        return wrapper
+    def move_forever(self):
+        if not self.movingForever:
+            self.movingForever = True
+            
+            #CONSTANTS
+            forward_cycle = 12.5
+            backward_cycle = 0.6
+            time_1_rev = 1.143
+            #CONSTANTS
+
+            s1_cycle = forward_cycle
+            s2_cycle = backward_cycle
+
+            self.forevertime = time.time()
+
+            self.pin1.ChangeDutyCycle(s1_cycle)
+            self.pin2.ChangeDutyCycle(s2_cycle)
+            time.sleep(0.2)
+
+    def stop_move_forever(self):
+        if self.movingForever:
+            self.pin1.ChangeDutyCycle(0)
+            self.pin2.ChangeDutyCycle(0)
+            endTime = time.time()
+            time.sleep(0.2)
+
+            travelTime = endTime - self.forevertime
+            units = travelTime/1.143
+
+            self.pos = ( self.pos[0] +  units*math.cos(math.radians(self.heading)) , self.pos[1] +  units*math.sin(math.radians(self.heading)) )
+            print(" - New Position: {}, {}".format(self.pos[0], self.pos[1]))
 
 
     def move(self, units, reverse=False):
-        self.isManualMoving = True
         #CONSTANTS
         forward_cycle = 12.5
         backward_cycle = 0.6
@@ -57,11 +75,8 @@ class ServoHandler:
 
         self.pos = ( self.pos[0] +  units*math.cos(math.radians(self.heading)) , self.pos[1] +  units*math.sin(math.radians(self.heading)) )
         print(" - New Position: {}, {}".format(self.pos[0], self.pos[1]))
-
-        self.isManualMoving = False
     
     def rotate(self, theta):
-        self.isManualMoving = True
         #CONSTANTS
         forward_cycle = 12.5
         backward_cycle = 0.6
@@ -101,18 +116,12 @@ class ServoHandler:
         self.heading = (self.heading + theta) % 360
         print(" - New Heading: {}".format(self.heading))
 
-        self.isManualMoving = False
-
     def set_heading(self, newheading):
-        self.isRunning = True
         theta = newheading -  self.heading
         self.rotate(theta)
         print(" - (Rotated {})".format(theta))
-        self.isRunning = False
 
     def set_position_rect(self, newpos):
-        self.isRunning = True
-
         x_travel = newpos[0] - self.pos[0]
         x_dir = 0 if x_travel >= 0 else 180
 
@@ -126,8 +135,6 @@ class ServoHandler:
         print("Heading {} Move {}".format(y_dir, abs(y_travel)))
         self.set_heading(y_dir)
         self.move(abs(y_travel))
-
-        self.isRunning = False
 
     def release(self):
         self.pin1.stop()
@@ -147,9 +154,9 @@ servo = ServoHandler(21, 23)
 # servo.rotate(-90)
 # servo.move(2)
 
-servo.set_position_rect((2,2))
+#servo.set_position_rect((2,2))
 # servo.set_position_rect((2,1))
-servo.set_position_rect((0,0))
+#servo.set_position_rect((0,0))
 
 # servo.rotate(90)
 # servo.rotate(-90)
@@ -160,4 +167,10 @@ servo.set_position_rect((0,0))
 #servo.rotate(270)
 #servo.rotate(-270)
 
-servo.release()
+#servo.move_forever()
+
+#time.sleep(1)
+
+#servo.stop_move_forever()
+
+#servo.release()
