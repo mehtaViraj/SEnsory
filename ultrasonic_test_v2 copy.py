@@ -1,7 +1,7 @@
-import ultrasonic_sensors
+import ultra_refresh
 import time
 
-sensors = ultrasonic_sensors.UltrasonicHandler([38, 40], [37, 35], [29, 31])
+sensors = ultra_refresh.UltrasonicHandler([38, 40], [37, 35], [29, 31])
 sensors.start_measuring()
 
 try:

@@ -30,7 +30,7 @@ class UltrasonicHandler:
 
     def _update_distance(self, trigger, echo):
         GPIO.output(trigger, GPIO.LOW)
-        time.sleep(0.35) #Wait for sensor to settle
+        time.sleep(0.4) #Wait for sensor to settle
 
         # set Trigger to HIGH
         GPIO.output(trigger, GPIO.HIGH)
@@ -38,11 +38,14 @@ class UltrasonicHandler:
         time.sleep(0.00001)
         GPIO.output(trigger, GPIO.LOW)
 
+        StartTimeOG = time.time()
         StartTime = time.time()
         StopTime = time.time()
         # save StartTime
         while GPIO.input(echo) == 0:
             StartTime = time.time()
+            if time.time() - StartTimeOG > 1:
+                return 500
         # save time of arrival
         while GPIO.input(echo) == 1:
             StopTime = time.time()
@@ -59,7 +62,7 @@ class UltrasonicHandler:
         while True:
             self.front = self._update_distance(self.front_trigger, self.front_echo)
             self.left =  self._update_distance(self.left_trigger, self.left_echo)
-            #self.right = self._update_distance(self.right_trigger, self.right_echo)
+            self.right = self._update_distance(self.right_trigger, self.right_echo)
     
     def start_measuring(self):
         if self.isStarted:
