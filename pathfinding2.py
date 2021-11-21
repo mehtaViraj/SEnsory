@@ -35,14 +35,10 @@ def right_turn():
     #indicator = 0
 
 
-def move_straight(isFound=False):
+def move_straight(colour, isFound=False):
     #global indicator
     # time.sleep(1)
     servo.move_forever()
-
-    #--------#
-    colour = 'yellow'
-    #--------#
 
     while(ultra.front > THRESHOLD_DISTANCE):
         #print("Front: "+str(ultra.front)[:6]+" | Left: "+str(ultra.left)[:6]+"| Right: "+str(ultra.right)[:6])
