@@ -19,9 +19,9 @@ coordinates = []
 
 def rotate_away(num):
     if num == 1:
-        servo.rotate(35)  # turn left
+        servo.rotate(15)  # turn left
     elif num == 0:
-        servo.rotate(-35)  # turn right
+        servo.rotate(-15)  # turn right
 
 
 def left_turn():

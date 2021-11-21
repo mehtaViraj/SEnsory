@@ -50,6 +50,8 @@ class ServoHandler:
 
             self.pos = ( self.pos[0] +  units*math.cos(math.radians(self.heading)) , self.pos[1] +  units*math.sin(math.radians(self.heading)) )
             print(" - New Position: {}, {}".format(self.pos[0], self.pos[1]))
+        
+        self.movingForever = False
 
 
     def move(self, units, reverse=False):
@@ -142,11 +144,11 @@ class ServoHandler:
 
 #MAIN
 
-servo = ServoHandler(21, 23)
+# servo = ServoHandler(21, 23)
 
-# servo.move(2)
-# servo.rotate(-90)
-# servo.move(2)
+# servo.move(5)
+# servo.rotate(180)
+# servo.move(5)
 # servo.rotate(-90)
 # servo.move(1)
 # servo.rotate(0)
@@ -156,6 +158,7 @@ servo = ServoHandler(21, 23)
 
 #servo.set_position_rect((2,2))
 # servo.set_position_rect((2,1))
+#servo.set_position_rect((3,0))
 #servo.set_position_rect((0,0))
 
 # servo.rotate(90)
@@ -173,4 +176,4 @@ servo = ServoHandler(21, 23)
 
 #servo.stop_move_forever()
 
-#servo.release()
+# servo.release()
