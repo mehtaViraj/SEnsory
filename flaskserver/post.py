@@ -1,7 +1,7 @@
 import requests
 import json
 
-base_url = "http://localhost:8080/"
+base_url = "http://localhost:8080/post"
 
 #final_url = "/{0}/friendly/{1}/url".format(base_url, any_value_here)
 
