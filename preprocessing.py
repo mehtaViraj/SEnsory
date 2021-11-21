@@ -5,7 +5,7 @@ from tensorflow.keras.utils import to_categorical
 import numpy as np
 from tqdm import tqdm
 
-DATA_PATH = "./recordings/"
+DATA_PATH = "./oop/"
 
 
 # Input: Folder Path
