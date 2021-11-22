@@ -1,19 +1,18 @@
 import os
 from flask import Flask, flash, request, redirect, url_for, jsonify, send_file
-from werkzeug.utils import send_from_directory
-from werkzeug.wrappers import response
 from os import listdir
 from os.path import isfile, join
 from delete_file import del_file
+import movement.pathfinding_test as pathfinding_test
 
 app = Flask(__name__)
 
 
 app.secret_key = os.urandom(12).hex()
-app.config['UPLOAD_FOLDER'] = 'C:\Waterloo\1A\SEnsory\SEnsory\oop\inner\\'
-app.config["CLIENT_IMAGES"] = 'C:\Waterloo\1A\SEnsory\SEnsory\colour_detection\saved_images'
+#app.config['UPLOAD_FOLDER'] = 'C:\Waterloo\1A\SEnsory\SEnsory\oop\inner\\'
+#app.config["CLIENT_IMAGES"] = 'C:\Waterloo\1A\SEnsory\SEnsory\colour_detection\saved_images'
 
-voice_folder = "C:\Waterloo\\1A\SEnsory\SEnsory\oop\inner\\"
+voice_folder = r'/home/pi/sensory/SEnsory/oop/inner'
 del_file(voice_folder)
 
 
@@ -31,7 +30,7 @@ def upload_file():
 
     if request.method == 'POST':
 
-        voice_folder = "C:\Waterloo\\1A\SEnsory\SEnsory\oop\inner\\"
+        voice_folder = r'/home/pi/sensory/SEnsory/oop/inner'
         del_file(voice_folder)
 
         if 'file' not in request.files:
@@ -58,9 +57,14 @@ def upload_file():
             flash('No selected file')
             return redirect(request.url) '''
         filename = file.filename
-        savepath = "C:\Waterloo\\1A\SEnsory\SEnsory\oop\inner\\" + filename
+        savepath = r'/home/pi/sensory/SEnsory/oop/inner/' + filename
         file.save(savepath)
         response = {"result": "success", "filename": filename}
+
+        del_file(r'/home/pi/sensory/SEnsory/flaskserver/movement/saved_images')
+
+        pathfinding_test.move_straight("yellow", isFound=False)
+
         return response
 
 
@@ -69,7 +73,7 @@ def send_data():
     print("reached GET")
 
     img_list = os.listdir(
-        "C:\Waterloo\\1A\SEnsory\SEnsory\colour_detection\saved_images")
+        r'/home/pi/sensory/SEnsory/flaskserver/movement/saved_images/')
     img_dict = {}
 
     img_dict["imgs"] = img_list
@@ -86,7 +90,7 @@ def send_data():
 @app.route('/encoded', methods=['GET'])
 def send_images():
 
-    directory = "C:\Waterloo\\1A\SEnsory\SEnsory\colour_detection\saved_images\\"
+    directory = r'/home/pi/sensory/SEnsory/flaskserver/movement/saved_images/'
 
     if request.method == 'GET':
         filename = request.args.get("image_name")
