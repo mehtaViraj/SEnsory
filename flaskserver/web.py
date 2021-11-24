@@ -63,7 +63,9 @@ def upload_file():
 
         del_file(r'/home/pi/sensory/SEnsory/flaskserver/movement/saved_images')
 
-        pathfinding_test.move_straight("yellow", isFound=False)
+        pathfinding_test.move_straight("yellow", 1, isFound=False)
+
+        del_file(r'/home/pi/sensory/SEnsory/flaskserver/movement/saved_images')
 
         return response
 
@@ -78,12 +80,13 @@ def send_data():
 
     img_dict["imgs"] = img_list
 
-    robot_state = 0
+    robot_state = 1
     img_dict["state"] = robot_state
     return_json = jsonify(img_dict)
     print(return_json)
 
     if request.method == 'GET':
+        print(img_dict)
         return return_json
 
 
