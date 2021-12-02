@@ -2,6 +2,8 @@ import RPi.GPIO as GPIO
 import time
 import threading
 
+from werkzeug.datastructures import FileStorage
+
 class UltrasonicHandler:
     def __init__(self, front_pins, left_pins, right_pins):  #Each dir_pins is a tuple of (triggerpin, echopin)
         #Save the pins
@@ -25,6 +27,7 @@ class UltrasonicHandler:
         self.right = 500
         self.isStarted = False
         self.measurement_thread = None
+        self.kill = False
 
         print("Front: {}, {} | Left: {}, {} | Right: {}, {}".format(self.front_trigger,self.front_echo,self.left_trigger,self.left_echo,self.right_trigger,self.right_echo))
 
@@ -59,10 +62,11 @@ class UltrasonicHandler:
         return distance
     
     def _thread_loop(self):
-        while True:
+        while not self.kill:
             self.front = self._update_distance(self.front_trigger, self.front_echo)
             self.left =  self._update_distance(self.left_trigger, self.left_echo)
             self.right = self._update_distance(self.right_trigger, self.right_echo)
+        print('Closing distance update thread')
     
     def start_measuring(self):
         if self.isStarted:
@@ -72,3 +76,12 @@ class UltrasonicHandler:
             self.measurement_thread.setDaemon(True)
             self.measurement_thread.start()
             self.isStarted = True
+
+    def release(self):
+        if self.kill:
+            print('Already released')
+        else:
+            self.kill=True
+            time.sleep(0.1)
+            GPIO.cleanup()
+            print('Ultrasonic stopped')

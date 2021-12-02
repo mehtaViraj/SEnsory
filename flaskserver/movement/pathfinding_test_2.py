@@ -3,33 +3,46 @@ import movement.ultrasonic_sensors as ultrasonic_sensors
 import time
 import movement.colour.colour_in_shape_filtered as cl
 
+
 class Pathfinding:
     def __init__(self):
-        #print("INITIALIZING")
-        self.THRESHOLD_DISTANCE = 35
+        # print("INITIALIZING")
+        self.THRESHOLD_DISTANCE = 50
 
-        self.ultra = ultrasonic_sensors.UltrasonicHandler([38, 40], [37, 35], [29, 31])
+        self.ultra = ultrasonic_sensors.UltrasonicHandler(
+            [38, 40], [37, 35], [29, 31])
         self.ultra.start_measuring()
 
         self.servo = servo_handler.ServoHandler(23, 21)
-        #self.cam = cl.CameraHandler("192.168.179.236")
+        self.cam = cl.CameraHandler("192.168.245.236")
 
         self.coordinates = []
         self.moves = []
         self.indexes = []
         self.colour = ""
-        #print("INITIALIZED")
+
+        self.pic_count = 0
+        # print("INITIALIZED")
+
+    # def reserve_servo(self):
+        #self.servo=servo_handler.ServoHandler(23, 21)
+
+    def release_all(self):
+        if self.servo != None:
+            self.servo.release()
+            self.cam.release()
+            self.ultra.release()
+            print('All hardware released')
 
     def test(self, seconds, cycle):
         #servo = SH.ServoHandler(21,23)
         self.servo.move_forever(cycle)
         time.sleep(seconds)
         self.servo.stop_move_forever()
-        #servo.release()
+        # servo.release()
 
     def calibrate(self, seconds):
         self.servo.calibrate_loop(seconds)
-
 
     def rotate_away(self, num):
         if num == 1:
@@ -37,17 +50,14 @@ class Pathfinding:
         elif num == 0:
             self.servo.rotate(5)  # turn right
 
-
     def left_turn(self, ):
         self.servo.rotate(90)
         #indicator = 0
-
 
     def right_turn(self, ):
         # if distance from the front and left are small
         self.servo.rotate(-90)
         #indicator = 0
-
 
     def check_coordinates(self, coordinates, turn_indicator):
 
@@ -100,8 +110,13 @@ class Pathfinding:
 
             self.indexes.append(len(self.moves)-1)
 
-
     def retrace(self, indexes):
+
+        if len(indexes) == 0:
+            print("Explored all of thr room")
+            self.servo.stop_move_forever()
+            return
+        
         desired_index = indexes[-1]
         number_of_moves = (len(self.moves)-1)-desired_index
 
@@ -123,10 +138,11 @@ class Pathfinding:
                 else:
                     self.servo.move_forever()
 
-
     def move_straight(self, colour, robot_state=1, isFound=False):
         #global indicator
         # time.sleep(1)
+
+        self.colour=colour
 
         self.servo.move_forever()
 
@@ -134,9 +150,17 @@ class Pathfinding:
 
         while(self.ultra.front > self.THRESHOLD_DISTANCE):
             print("Front: "+str(self.ultra.front)
-                [:6]+" | Left: "+str(self.ultra.left)[:6]+"| Right: "+str(self.ultra.right)[:6]+"  -  NEW")
-            found_objects = self.cam.find_obj(colour)
+                  [:6]+" | Left: "+str(self.ultra.left)[:6]+"| Right: "+str(self.ultra.right)[:6]+"  -  NEW")
+            try: 
+                found_objects = self.cam.find_obj(colour)
+            except KeyError:
+                print("Excepted KeyError: No key '{}'".format(colour))
+                return
             # print(found_objects)
+            if self.pic_count >= 4:
+                print('Found plenty of items, finishing.')
+                return
+
             if not isFound and (len(found_objects) != 0):
                 # servo.stop_move_forever()
 
@@ -144,7 +168,7 @@ class Pathfinding:
                 # servo.stop_move_forever()
                 self.cam.save_picture()
                 isFound = True
-                robot_state = 0
+                self.pic_count = self.pic_count + 1
                 #move_straight(colour, 0, isFound)
             if isFound and (len(found_objects) == 0):
                 isFound = False

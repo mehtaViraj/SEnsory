@@ -5,7 +5,7 @@ from tensorflow.keras.utils import to_categorical
 import numpy as np
 from tqdm import tqdm
 
-DATA_PATH = "./oop/"
+DATA_PATH = "/home/pi/sensory/SEnsory/oop"
 
 
 # Input: Folder Path
@@ -42,10 +42,30 @@ def save_data_to_array(path=DATA_PATH, max_len=11, n_mfcc=20):
         # Init mfcc vectors
         mfcc_vectors = []
 
-        wavfiles = [path + label + '/' + wavfile for wavfile in os.listdir(path + '/' + label)]
+        wavfiles = [path + '/' + label + '/' + wavfile for wavfile in os.listdir(path + '/' + label)]
         for wavfile in tqdm(wavfiles, "Saving vectors of label - '{}'".format(label)):
             mfcc = wav2mfcc(wavfile, max_len=max_len, n_mfcc=n_mfcc)
             mfcc_vectors.append(mfcc)
+        np.save(label + '.npy', mfcc_vectors)
+
+def get_test_data_array(path=DATA_PATH, max_len=11, n_mfcc=20):
+    labels, _, _ = get_labels(path)
+    for label in labels:
+        # Init mfcc vectors
+        mfcc_vectors = []
+
+        wavfiles = [path + '/' + label + '/' + wavfile for wavfile in os.listdir(path + '/' + label)]
+        tqdm_iteratable = tqdm(wavfiles, "Saving vectors of label - '{}'".format(label))
+        print("TQDM complete")
+        #print(type(tqdm_iteratable))
+        #print(tqdm_iteratable)
+        for wavfile in  tqdm_iteratable:
+            mfcc = wav2mfcc(wavfile, max_len=max_len, n_mfcc=n_mfcc)
+            mfcc_vectors.append(mfcc)
+            #print("Looped")
+            mfcc_vectors.append(mfcc)
+            print("Override vector saving loop")
+            break
         np.save(label + '.npy', mfcc_vectors)
 
 

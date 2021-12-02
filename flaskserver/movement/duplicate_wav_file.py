@@ -3,7 +3,7 @@ import os
 
 def read_wav_file_to_copy(name):
     filename = r'/home/pi/sensory/SEnsory/oop/inner'
-    filename += f"\{name}"
+    filename += f"/{name}"
     wave_read = wave.open(filename, 'rb')
     return wave_read
 
@@ -11,7 +11,7 @@ def read_wav_file_to_copy(name):
 def wav_file_to_write(name):
     filename = r"/home/pi/sensory/SEnsory/oop/inner"
     name = name.split(".")[0] 
-    filename += f"\{name}_copy"+".wav"
+    filename += f"/{name}_copy"+".wav"
     wav_obj = wave.open(filename, 'wb')
     return wav_obj
 
@@ -30,8 +30,8 @@ def copy_file(wav_read, wav_write):
     
 
 
-if __name__ == "__main__":
-    onlyfiles = os.listdir(r"C:\comp codes\SEnsory\oop\inner")
+def duplicateIt():
+    onlyfiles = os.listdir(r"/home/pi/sensory/SEnsory/oop/inner")
     
     wav_read = read_wav_file_to_copy(onlyfiles[0])
     wav_write = wav_file_to_write(onlyfiles[0])

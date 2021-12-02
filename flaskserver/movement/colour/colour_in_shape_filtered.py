@@ -29,6 +29,7 @@ class CameraHandler:
         cv2.destroyAllWindows()
 
     def find_obj(self, to_find):
+        print("Looking for {}".format(to_find))
         # Reading the video from the
         # webcam in image frames
         big_frame = self.vs.read()
