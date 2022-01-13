@@ -5,31 +5,31 @@ import threading
 from werkzeug.datastructures import FileStorage
 
 class UltrasonicHandler:
-    def __init__(self, front_pins, left_pins, right_pins):  #Each dir_pins is a tuple of (triggerpin, echopin)
+    def __init__(self, front_pins):  #Each dir_pins is a tuple of (triggerpin, echopin)
         #Save the pins
         self.front_trigger = front_pins[0]
         self.front_echo = front_pins[1]
-        self.left_trigger = left_pins[0]
-        self.left_echo = left_pins[1]
-        self.right_trigger = right_pins[0]
-        self.right_echo = right_pins[1]
+        # self.left_trigger = left_pins[0]
+        # self.left_echo = left_pins[1]
+        # self.right_trigger = right_pins[0]
+        # self.right_echo = right_pins[1]
         #Setup the pins
         GPIO.setmode(GPIO.BOARD)
         GPIO.setup(self.front_trigger, GPIO.OUT)
         GPIO.setup(self.front_echo, GPIO.IN)
-        GPIO.setup(self.left_trigger, GPIO.OUT)
-        GPIO.setup(self.left_echo, GPIO.IN)
-        GPIO.setup(self.right_trigger, GPIO.OUT)
-        GPIO.setup(self.right_echo, GPIO.IN)
+        # GPIO.setup(self.left_trigger, GPIO.OUT)
+        # GPIO.setup(self.left_echo, GPIO.IN)
+        # GPIO.setup(self.right_trigger, GPIO.OUT)
+        # GPIO.setup(self.right_echo, GPIO.IN)
 
         self.front = 500
-        self.left = 500
-        self.right = 500
+        # self.left = 500
+        # self.right = 500
         self.isStarted = False
         self.measurement_thread = None
         self.kill = False
 
-        print("Front: {}, {} | Left: {}, {} | Right: {}, {}".format(self.front_trigger,self.front_echo,self.left_trigger,self.left_echo,self.right_trigger,self.right_echo))
+        print("Front: {}, {}".format(self.front_trigger,self.front_echo))
 
     def _update_distance(self, trigger, echo):
         GPIO.output(trigger, GPIO.LOW)
@@ -64,8 +64,8 @@ class UltrasonicHandler:
     def _thread_loop(self):
         while not self.kill:
             self.front = self._update_distance(self.front_trigger, self.front_echo)
-            self.left =  self._update_distance(self.left_trigger, self.left_echo)
-            self.right = self._update_distance(self.right_trigger, self.right_echo)
+            # self.left =  self._update_distance(self.left_trigger, self.left_echo)
+            # self.right = self._update_distance(self.right_trigger, self.right_echo)
         print('Closing distance update thread')
     
     def start_measuring(self):
